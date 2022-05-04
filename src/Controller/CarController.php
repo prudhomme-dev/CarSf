@@ -114,12 +114,18 @@ class CarController extends AbstractController
     #[Route('/{id}', name: 'app_car_delete', methods: ['POST'])]
     public function delete(Request $request, Car $car, CarRepository $carRepository): Response
     {
-        if ($this->isCsrfTokenValid('delete' . $car->getId(), $request->request->get('_token'))) {
-            $car->setActive(false);
-            $carRepository->add($car);
-        }
+        if ($this->getUser()) {
+            if ($car->getUserCar()->getId() === $this->getUser()->getId() || $this->isGranted("ROLE_ADMIN")) {
+                if ($this->isCsrfTokenValid('delete' . $car->getId(), $request->request->get('_token'))) {
+                    $car->setActive(false);
+                    $carRepository->add($car);
+                }
 
-        return $this->redirectToRoute('app_car_index', [], Response::HTTP_SEE_OTHER);
+                return $this->redirectToRoute('app_main', [], Response::HTTP_SEE_OTHER);
+            }
+            return $this->redirectToRoute("app_main");
+        }
+        return $this->redirectToRoute("app_login");
     }
 
 }
