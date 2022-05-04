@@ -33,6 +33,7 @@ class CarController extends AbstractController
             $form->handleRequest($request);
 
             if ($form->isSubmitted() && $form->isValid()) {
+                $car->setUserCar($this->getUser());
                 // Upload photo
                 $files = $form->get('photoUpload')->getData();
                 if ($files) {
@@ -71,35 +72,42 @@ class CarController extends AbstractController
 
     }
 
-    #[IsGranted("ROLE_ADMIN")]
     #[Route('/{id}/edit', name: 'app_car_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Car $car, CarRepository $carRepository): Response
     {
-        $form = $this->createForm(CarType::class, $car);
-        $form->handleRequest($request);
+        if ($this->getUser()) {
+            if ($car->getUserCar()->getId() === $this->getUser()->getId() || $this->isGranted("ROLE_ADMIN")) {
+                $form = $this->createForm(CarType::class, $car);
+                $form->handleRequest($request);
 
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            // Upload photo
-            $files = $form->get('photoUpload')->getData();
-            if ($files) {
-                $extension = $files->guessExtension();
-                if (!$extension) {
-                    // extension cannot be guessed
-                    $extension = 'bin';
+                if ($form->isSubmitted() && $form->isValid()) {
+                    // Upload photo
+                    $files = $form->get('photoUpload')->getData();
+                    if ($files) {
+                        $extension = $files->guessExtension();
+                        if (!$extension) {
+                            // extension cannot be guessed
+                            $extension = 'bin';
+                        }
+                        $newFileName = uniqid("ph_") . "." . $extension;
+                        $files->move(self::DIRECTORY, $newFileName);
+                        $car->setPhoto(self::DIRECTORY . $newFileName);
+                    }
+                    $carRepository->add($car);
+                    return $this->redirectToRoute('app_main', [], Response::HTTP_SEE_OTHER);
                 }
-                $newFileName = uniqid("ph_") . "." . $extension;
-                $files->move(self::DIRECTORY, $newFileName);
-                $car->setPhoto(self::DIRECTORY . $newFileName);
+
+                return $this->renderForm('car/edit.html.twig', [
+                    'car' => $car,
+                    'form' => $form,
+                ]);
             }
-            $carRepository->add($car);
-            return $this->redirectToRoute('app_main', [], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute("app_main");
         }
 
-        return $this->renderForm('car/edit.html.twig', [
-            'car' => $car,
-            'form' => $form,
-        ]);
+        return $this->redirectToRoute("app_login");
+
     }
 
     #[IsGranted("ROLE_ADMIN")]

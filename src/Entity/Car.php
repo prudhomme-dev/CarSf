@@ -48,6 +48,9 @@ class Car
     #[ORM\Column(type: 'boolean')]
     private $active;
 
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'cars')]
+    private $UserCar;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -181,6 +184,18 @@ class Car
     public function setActive(bool $active): self
     {
         $this->active = $active;
+
+        return $this;
+    }
+
+    public function getUserCar(): ?User
+    {
+        return $this->UserCar;
+    }
+
+    public function setUserCar(?User $UserCar): self
+    {
+        $this->UserCar = $UserCar;
 
         return $this;
     }
