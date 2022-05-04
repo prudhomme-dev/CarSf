@@ -3,56 +3,59 @@
 {% block title %}Car{% endblock %}
 
 {% block body %}
-    <h1>Car</h1>
+    <article class="container">
+        <div class="row text-center">
+            <h1>{{ car.title }}</h1>
+        </div>
+        {% if car.photo %}
+            <div class="row justify-content-center">
+                <h4 class="card-title col-5"><img
+                            src="{{ asset(car.photo) }}"
+                            alt="{{ car.title }}" class="img-thumbnail">
+                </h4></div>
+        {% endif %}
+        <div class="row mt-2 mb-3">
 
-    <table class="table">
-        <tbody>
-            <tr>
-                <th>Id</th>
-                <td>{{ car.id }}</td>
-            </tr>
-            <tr>
-                <th>Title</th>
-                <td>{{ car.title }}</td>
-            </tr>
-            <tr>
-                <th>Description</th>
-                <td>{{ car.description }}</td>
-            </tr>
-            <tr>
-                <th>Model</th>
-                <td>{{ car.model }}</td>
-            </tr>
-            <tr>
-                <th>Price</th>
-                <td>{{ car.price }}</td>
-            </tr>
-            <tr>
-                <th>ReleaseYear</th>
-                <td>{{ car.releaseYear }}</td>
-            </tr>
-            <tr>
-                <th>Km</th>
-                <td>{{ car.km }}</td>
-            </tr>
-            <tr>
-                <th>LicenceDriver</th>
-                <td>{{ car.licenceDriver ? 'Yes' : 'No' }}</td>
-            </tr>
-            <tr>
-                <th>Photo</th>
-                <td>{{ car.photo }}</td>
-            </tr>
-            <tr>
-                <th>Active</th>
-                <td>{{ car.active ? 'Yes' : 'No' }}</td>
-            </tr>
-        </tbody>
-    </table>
+            <div class="accordion accordion-flush" id="accordionExample">
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingOne">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                            {{ car.brand }} {{ car.model }} {{ car.energy }} - {{ car.price }} €
+                        </button>
+                    </h2>
+                    <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne"
+                         data-bs-parent="#accordionExample">
+                        <div class="accordion-body">
 
-    <a href="{{ path('app_car_index') }}">back to list</a>
+                            {{ car.description }}
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingTwo">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                            Données du véhicule
+                        </button>
+                    </h2>
+                    <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo"
+                         data-bs-parent="#accordionExample">
+                        <div class="accordion-body">
+                            <li>{{ car.km }} km</li>
+                            <li>Année de construction : {{ car.releaseYear }}</li>
+                            {% if not car.licenceDriver %}
+                                <li>Voiture sans permis</li>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
 
-    <a href="{{ path('app_car_edit', {'id': car.id}) }}">edit</a>
+            </div>
+        </div>
 
-    {{ include('car/_delete_form.html.twig') }}
+
+    </article>
+    <div class="row justify-content-center"><a href="{{ path('app_main') }}" class="btn btn-success col-2">Retour à
+            l'accueil</a></div>
 {% endblock %}
