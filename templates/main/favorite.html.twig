@@ -1,0 +1,54 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}CarSf {% endblock %}
+
+{% block body %}
+    <div class="container">
+        <div class="row"><h1 class="text-center">Mes Favoris</h1></div>
+        <div class="row justify-content-center">
+            {% for favorite in favorites %}
+                <div class="card col-5 p-1 m-2">
+                    <div class="card-body text-center">
+                        {% if favorite.car.photo %}
+                            <h4 class="card-title"><a
+                                        href="{{ path('app_car_show', {'id': favorite.car.id}) }}"><img
+                                            src="{{ asset(favorite.car.photo) }}"
+                                            alt="{{ favorite.car.title }}" class="img-thumbnail"
+                                            style="max-height: 300px"></a>
+                            </h4>
+                        {% else %}
+                            <h4 class="card-title"><a
+                                        href="{{ path('app_car_show', {'id': favorite.car.id}) }}"><img
+                                            src="https://via.placeholder.com/1280x900"
+                                            alt="{{ favorite.car.title }}" class="img-thumbnail"
+                                            style="max-height: 300px"></a>
+                            </h4>
+                        {% endif %}
+                        <h4 class="card-title"><a class="link-warning"
+                                                  href="{{ path('app_car_show', {'id': favorite.car.id}) }}">{{ favorite.car.title }}</a>
+                        </h4>
+                        <h5 class="card-title">{{ favorite.car.brand }} {{ favorite.car.model }} {{ favorite.car.energy }}
+                            - {{ favorite.car.price }} €</h5>
+                        <h6 class="card-title">{{ favorite.car.km }} km / Année {{ favorite.car.releaseYear }}</h6>
+                    </div>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">{{ favorite.car.description }}</li>
+                        {% if not favorite.car.licenceDriver %}
+                            <li class="list-group-item">Voiture sans permis</li>
+                        {% endif %}
+                    </ul>
+                    <div class="cardbody text-center">
+                        {% if app.user %}
+                            <a href="{{ path('app_favorite', {'idCar': favorite.car.id}) }}"
+                               class="card-link m-2 btn btn-warning">
+                                Retirer des favoris
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            {% else %}
+                <div class="row"><h3>Vous n'avez aucun favoris</h3></div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

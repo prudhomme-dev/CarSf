@@ -16,6 +16,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\File;
 
 class CarType extends AbstractType
 {
@@ -31,7 +32,11 @@ class CarType extends AbstractType
             ->add('releaseYear', TextType::class, ["label" => "Année de construction"])
             ->add('km', IntegerType::class, ["label" => "Kilométrage"])
             ->add('licenceDriver', CheckboxType::class, ["label" => "Avec permis", "required" => false, "attr" => ["checked" => true]])
-            ->add('photoUpload', FileType::class, ["label" => "Photo", "required" => false, "mapped" => false])
+            ->add('photoUpload', FileType::class, ["label" => "Photo", "required" => false, "mapped" => false, 'constraints' => [new File([
+                'maxSize' => '5360k',
+                'maxSizeMessage' => 'Taille du fichier trop importante',
+                'mimeTypes' => ['image/jpeg', 'image/png'], 'mimeTypesMessage' => 'Merci de téléverser une image JPEG ou PNG'
+            ])]])
             ->add('active', HiddenType::class, ["attr" => ["checked" => true]]);
 
     }

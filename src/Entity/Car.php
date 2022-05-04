@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\CarRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: CarRepository::class)]
@@ -50,6 +52,14 @@ class Car
 
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'cars')]
     private $UserCar;
+
+    #[ORM\OneToMany(mappedBy: 'Car', targetEntity: Favorite::class)]
+    private $favorites;
+
+    public function __construct()
+    {
+        $this->favorites = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -198,5 +208,40 @@ class Car
         $this->UserCar = $UserCar;
 
         return $this;
+    }
+
+    /**
+     * @return Collection<int, Favorite>
+     */
+    public function getFavorites(): Collection
+    {
+        return $this->favorites;
+    }
+
+    public function addFavorite(Favorite $favorite): self
+    {
+        if (!$this->favorites->contains($favorite)) {
+            $this->favorites[] = $favorite;
+            $favorite->setCar($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFavorite(Favorite $favorite): self
+    {
+        if ($this->favorites->removeElement($favorite)) {
+            // set the owning side to null (unless already changed)
+            if ($favorite->getCar() === $this) {
+                $favorite->setCar(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function isFavorite(): bool
+    {
+        return count($this->favorites->getValues());
     }
 }
