@@ -1,0 +1,18 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}CarSf : Erreur 500 {% endblock %}
+
+{% block body %}
+    <div class="row">
+        <h1>Erreur Serveur</h1>
+    </div>
+
+    <div class="row">
+        <p>Oups le développeur a mal fait son boulot !!!</p>
+    </div>
+
+    <div class="row justify-content-center"><a href="{{ path('app_main') }}" class="btn btn-success col-2">Retour à
+            l'accueil</a></div>
+
+
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}CarSf : Erreur 404 {% endblock %}
+
+{% block body %}
+    <div class="row">
+        <h1>Erreur 404</h1>
+    </div>
+
+    <div class="row">
+        <p>Fais comme le petit poucet pour retrouver ton chemin</p>
+    </div>
+
+    <div class="row justify-content-center"><a href="{{ path('app_main') }}" class="btn btn-success col-2">Retour à
+            l'accueil</a></div>
+
+{% endblock %}

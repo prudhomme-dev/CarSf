@@ -27,30 +27,36 @@ class CarController extends AbstractController
     #[Route('/new', name: 'app_car_new', methods: ['GET', 'POST'])]
     public function new(Request $request, CarRepository $carRepository): Response
     {
-        $car = new Car();
-        $form = $this->createForm(CarType::class, $car);
-        $form->handleRequest($request);
+        if ($this->getUser()) {
+            $car = new Car();
+            $form = $this->createForm(CarType::class, $car);
+            $form->handleRequest($request);
 
-        // Upload photo
-        $files = $form->get('photoUpload')->getData();
-        if ($files) {
-            $extension = $files->guessExtension();
-            if (!$extension) {
-                // extension cannot be guessed
-                $extension = 'bin';
+            if ($form->isSubmitted() && $form->isValid()) {
+                // Upload photo
+                $files = $form->get('photoUpload')->getData();
+                if ($files) {
+                    $extension = $files->guessExtension();
+                    if (!$extension) {
+                        // extension cannot be guessed
+                        $extension = 'bin';
+                    }
+                    $newFileName = uniqid("ph_") . "." . $extension;
+                    $files->move(self::DIRECTORY, $newFileName);
+                    $car->setPhoto(self::DIRECTORY . $newFileName);
+                }
+                $car->setActive(true);
+                $carRepository->add($car);
+                return $this->redirectToRoute('app_main', [], Response::HTTP_SEE_OTHER);
             }
-            $newFileName = uniqid("ph_") . "." . $extension;
-            $files->move(self::DIRECTORY, $newFileName);
-            $car->setPhoto(self::DIRECTORY . $newFileName);
-        }
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $car->setActive(true);
-            $carRepository->add($car);
-            return $this->redirectToRoute('app_car_index', [], Response::HTTP_SEE_OTHER);
+            return $this->renderForm('car/new.html.twig', [
+                'car' => $car,
+                'form' => $form,
+            ]);
         }
+        return $this->redirectToRoute("app_login");
 
-        return $this->redirectToRoute("app_main");
     }
 
     #[Route('/{id}', name: 'app_car_show', methods: ['GET'])]
@@ -71,20 +77,21 @@ class CarController extends AbstractController
     {
         $form = $this->createForm(CarType::class, $car);
         $form->handleRequest($request);
-        // Upload photo
-        $files = $form->get('photoUpload')->getData();
-        if ($files) {
-            $extension = $files->guessExtension();
-            if (!$extension) {
-                // extension cannot be guessed
-                $extension = 'bin';
-            }
-            $newFileName = uniqid("ph_") . "." . $extension;
-            $files->move(self::DIRECTORY, $newFileName);
-            $car->setPhoto(self::DIRECTORY . $newFileName);
-        }
+
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // Upload photo
+            $files = $form->get('photoUpload')->getData();
+            if ($files) {
+                $extension = $files->guessExtension();
+                if (!$extension) {
+                    // extension cannot be guessed
+                    $extension = 'bin';
+                }
+                $newFileName = uniqid("ph_") . "." . $extension;
+                $files->move(self::DIRECTORY, $newFileName);
+                $car->setPhoto(self::DIRECTORY . $newFileName);
+            }
             $carRepository->add($car);
             return $this->redirectToRoute('app_main', [], Response::HTTP_SEE_OTHER);
         }
